@@ -1,0 +1,62 @@
+1. python3 -m venv env
+2. .\env\Scripts\activate
+3. pip install flask azure-cognitiveservices-vision-computervision
+from flask import Flask, request, jsonify
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+from msrest.authentication import CognitiveServicesCredentials
+
+app = Flask(__name__)
+
+# Replace with your own Azure Cognitive Services values
+ENDPOINT = '<YOUR_ENDPOINT>'
+KEY = '<YOUR_KEY>'
+
+@app.route('/analyze', methods=['POST'])
+def analyze_image():
+    url = request.json['url']
+    
+    client = ComputerVisionClient(ENDPOINT, CognitiveServicesCredentials(KEY))
+    
+    # Analyze the image
+    image_analysis = client.analyze_image(url, visual_features=[VisualFeatureTypes.description])
+    
+    # Extract the image description
+    image_description = image_analysis.description.captions[0].text
+    
+    return jsonify({'description': image_description})
+
+if __name__ == '__main__':
+    app.run()
+
+4.postman:
+Step 1: Open Postman
+
+Open the Postman application on your computer. If you haven't installed it yet, you can download it from the official website: https://www.postman.com/downloads/
+Step 2: Create a new request
+
+Click on the "New" button in the top left corner of the Postman window.
+Select the "Request" option to create a new request.
+Step 3: Set up the request
+
+In the request tab, enter the URL of your Flask application endpoint. For example, if you're running the application locally, the URL will be http://localhost:5000/analyze.
+Set the request method to "POST".
+Step 4: Set the request body
+
+Click on the "Body" tab below the request URL field.
+Select the "raw" option and choose "JSON" from the dropdown menu.
+
+Step 5: Enter the JSON payload
+{
+  "url": "<YOUR_IMAGE_URL>"
+}
+
+Step 6: Send the request
+
+Click on the "Send" button next to the request URL field to send the request to the Flask API.
+Step 7: View the response
+
+After sending the request, you will see the response below the request details.
+The response will contain the analyzed image description in JSON format.
+
+
